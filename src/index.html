@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Monopoly Game</title>
+
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="d-flex justify-content-center flex-column">
+    <!-- monopoly game banner -->
+    <div class="container min-width banner">
+      <img id="monopoly" class="m-1" src="assets/monopoly.png" alt="banner" />
+      <img id="game" class="m-1" src="assets/game.png" alt="banner" />
+      <img id="dice1" class="m-1" src="assets/dice1.png" alt="banner" />
+      <img id="dice4" class="m-1" src="assets/dice4.png" alt="banner" />
+    </div>
+    <!-- 使 main.ts 資料 顯示於此 -->
+    <app-root>Loading...</app-root>
+
+    <div
+      ng-app=""
+      class="
+        container
+        box-shadow
+        min-width
+        d-flex
+        justify-content-center
+        col-xl-
+        rounded-lg
+        bg
+      "
+    >
+      <!-- square grid -->
+      <div class="p-4 d-flex flex-column">
+        <div class="row">
+          <div class="cell m-1"></div>
+          <div class="cell m-1"></div>
+          <div class="cell m-1"></div>
+          <div class="cell m-1"></div>
+          <div class="cell m-1"></div>
+        </div>
+        <div class="row d-flex justify-content-between">
+          <div class="cell m-1"></div>
+          <div class="cell m-1"></div>
+        </div>
+        <div class="row d-flex justify-content-between">
+          <div class="cell m-1"></div>
+          <div class="cell m-1"></div>
+        </div>
+        <div class="row d-flex justify-content-between">
+          <div class="cell m-1"></div>
+          <div class="cell m-1"></div>
+        </div>
+        <div class="row">
+          <div class="cell m-1"></div>
+          <div class="cell m-1"></div>
+          <div class="cell m-1"></div>
+          <div class="cell m-1"></div>
+          <div class="cell m-1"></div>
+        </div>
+
+        <!-- dice -->
+        <div></div>
+      </div>
+    </div>
+
+    <!-- score -->
+    <div class="container mt-3 score"></div>
+
+    <script src="script.js"></script>
+    <script src="myApp.js"></script>
+  </body>
+</html>
