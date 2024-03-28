@@ -69,7 +69,7 @@ body {
   transition: .2s;
 }
 
-.score {
+.scoreBoard {
   width: 80%;
   height: 120px;
   background-color: rgb(255, 255, 255);
@@ -83,6 +83,14 @@ body {
 
 .scoreText {
   font-size: 40px;
+}
+
+.score {
+  position: absolute;
+  top: 10px;
+
+  text-align: center;
+  font-size: 65px;
 }
 
 .min-width {
