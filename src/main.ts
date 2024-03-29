@@ -71,7 +71,7 @@ bootstrapApplication(gameSetApp);
 @Component({
   selector: 'game-work',
   standalone: true,
-  template: '<div></div>'
+  template: '<div>123456</div>'
 })
 export class gameWorkApp {
   
