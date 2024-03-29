@@ -7,6 +7,7 @@
   </head>
 
   <body class="d-flex justify-content-center align-items-center flex-column">
+
     <!-- monopoly game banner -->
     <div class="container min-width banner">
       <img id="monopoly" class="m-1" src="assets/monopoly.png" alt="banner" />
@@ -16,9 +17,13 @@
     </div>
 
     <div class="container box-shadow min-width d-flex justify-content-center col-xl- rounded-lg bg">
-      
+
       <!-- square grid -->
       <div class="p-4 d-flex flex-column parentsPosition">
+             
+        <!-- game set -->
+        <game-set></game-set>
+
         <div class="row">
           <div class="cell m-1"></div>
           <div class="cell m-1"></div>
@@ -44,18 +49,17 @@
           <div class="cell m-1"></div>
           <div class="cell m-1"></div>
           <div class="cell m-1"></div>
+        </div>
 
-          <!-- character -->
-          <div class="character">
-            <img class="squareCharacter" src="assets/square.png" alt="square character" />
-            <img class="circleCharacter" src="assets/circle.png" alt="circle character" />
-          </div>
+        <!-- character -->
+        <div class="character">
+          <img class="squareCharacter" src="assets/square.png" alt="square character" />
+          <img class="circleCharacter" src="assets/circle.png" alt="circle character" />
+        </div>
 
-          <!-- dice -->
-          <div>
-            <img class="rollDice" src="assets/roll.png" alt="roll-dice">
-          </div>
-        
+        <!-- dice -->
+        <div>
+          <img class="rollDice" src="assets/roll.png" alt="roll-dice">
         </div>
 
       </div>
