@@ -1,7 +1,21 @@
-import { Component, ElementRef, ViewChild} from '@angular/core';
+import { Component, ElementRef, ViewChild, Injectable} from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import 'zone.js';
 import { makeBindingParser } from '@angular/compiler';
+import { BehaviorSubject, Observable } from 'rxjs';
+
+
+@Injectable({
+  providedIn: 'root'
+})
+export class DataService {
+  private messageSource = new BehaviorSubject<any>(null);
+  currentMessage = this.messageSource.asObservable();
+
+  setData(newData: any) {
+    this.messageSource.next(newData);
+  }
+}
 
 
 // SELECT WIN CONDITION
@@ -12,6 +26,7 @@ import { makeBindingParser } from '@angular/compiler';
   styleUrls: ['./template/css/gameSet.css']
 })
 export class gameSetApp {
+  message: any;
 
   // get button element ID "getFirst"
   @ViewChild('getFirst', {static: true}) getFirst: ElementRef;
@@ -19,11 +34,12 @@ export class gameSetApp {
   // get button element ID "getFirst"
   @ViewChild('getScore', {static: true}) getScore: ElementRef;
 
-  constructor() {
-    // 初始化为一个空的 ElementRef
+  constructor(private dataService: DataService) {
+    this.dataService.currentMessage.subscribe(data => this.message = data);
+    // 初始化一个空的 ElementRef
     this.getFirst = {} as ElementRef;
 
-    // 初始化为一个空的 ElementRef
+    // 初始化一个空的 ElementRef
     this.getScore = {} as ElementRef;
   }
 
@@ -64,17 +80,28 @@ export class gameSetApp {
   test: string = 'test';
 }
 
-bootstrapApplication(gameSetApp);
 
-
-// GAME WORK
+// GAME CELL WORK
 @Component({
-  selector: 'game-work',
+  selector: 'game-cell-work',
   standalone: true,
-  template: '<div>123456</div>'
+  templateUrl: './template/html/gameCellWork.html'
 })
-export class gameWorkApp {
+export class gameCellWorkApp {
   
 }
 
-bootstrapApplication(gameWorkApp);
+
+// Composite components
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [gameSetApp, gameCellWorkApp],
+  template: `
+    <game-set></game-set>
+    <game-cell-work></game-cell-work>
+  `
+})
+export class AppComponent {}
+
+bootstrapApplication(AppComponent);
