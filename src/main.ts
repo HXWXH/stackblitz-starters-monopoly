@@ -132,7 +132,71 @@ export class gameSetApp {
   styleUrls: ['./template/css/gameCellWork.css']
 })
 export class gameCellWorkApp {
-  winCondition: any;
+  winCondition: any; // 勝利條件儲存變數
+
+  // 問題資料
+  questions=[
+    {
+      question: '如果小明有3支鉛筆，小華給了他5支鉛筆，請問小明現在總共有多少支鉛筆？',
+      options: ['8支', '6支', '7支'],
+      answer: '8支'
+    },
+    {
+      question: '如果一個蘋果賣5元，小美用20元買了幾個蘋果？',
+      options: ['4個', '3個', '5個'],
+      answer: '4個'
+    },
+    {
+      question: '如果一個長方形花園的長是6公尺，寬是3公尺，請問它的面積是多少平方公尺？',
+      options: ['18平方公尺', '9平方公尺', '20平方公尺'],
+      answer: '18平方公尺'
+    },
+    {
+      question: '如果一個數字比6大2，結果是多少？',
+      options: ['8', '7', '9'],
+      answer: '8'
+    },
+    {
+      question: '如果小明每天睡覺前都看書半小時，一個星期看了多少小時的書？',
+      options: ['3.5小時', '3小時', '4.5小時'],
+      answer: '3.5小時'
+    },
+    {
+      question: '「一鳴驚人」是用來形容什麼情況？',
+      options: [
+        '比喻平時默默無聞，而後卻突然有驚人的表現。',
+        '比喻圓滿美好毫無缺陷的境界。',
+        '比喻多此一舉，反將事情弄糟。'],
+      answer: '比喻平時默默無聞，而後卻突然有驚人的表現。'
+    },
+    {
+      question: '「畫蛇添足」這個成語的意思是什麼？',
+      options: ['比喻多此一舉，反將事情弄糟。',
+      '比喻平時默默無聞，而後卻突然有驚人的表現。',
+      '比喻見識淺薄的人。'],
+      answer: '比喻多此一舉，反將事情弄糟。'
+    },
+    {
+      question: '「井底之蛙」這個成語是形容什麼樣的人？',
+      options: ['比喻見識淺薄的人。',
+      '比喻多此一舉，反將事情弄糟。',
+      '比喻盲目胡亂地模仿他人，結果卻適得其反。'],
+      answer: '比喻見識淺薄的人。'
+    },
+    {
+      question: '「東施效顰」這個成語的意思是什麼？',
+      options: ['比喻盲目胡亂地模仿他人，結果卻適得其反。',
+      '比喻見識淺薄的人。',
+      '比喻圓滿美好毫無缺陷的境界。'],
+      answer: '比喻盲目胡亂地模仿他人，結果卻適得其反。'
+    },
+    {
+      question: '「十全十美」這個成語的意思是什麼？',
+      options: ['比喻圓滿美好毫無缺陷的境界。',
+      '比喻盲目胡亂地模仿他人，結果卻適得其反。',
+      '比喻平時默默無聞，而後卻突然有驚人的表現。'],
+      answer: '比喻圓滿美好毫無缺陷的境界。'
+    }]
 
   constructor(private dataService: DataService) {
     this.dataService.winConditionSelect.subscribe(data => {
