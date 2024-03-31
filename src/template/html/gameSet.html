@@ -1,14 +1,14 @@
 <!-- game set -->
-<div class="gameSet d-flex flex-column justify-content-between align-items-center p-5 border bg-white border-info rounded shadow-lg">
+<div #gameSetBoard class="gameSet d-flex flex-column justify-content-between align-items-center p-5 border bg-white border-info rounded shadow-lg">
     <h1 class="mb-5">選擇獲勝條件</h1>
     <div class="d-flex flex-row justify-content-between align-items-center mb-5">
         <div class="d-inline ml-5 mr-5">
-            <button #getFirst class="buttonWidth btn-lg btn-primary" (click)="disabledTrue(); selectGetFirst();">先繞一圈獲勝</button>
+            <button #getFirst class="buttonWidth btn-lg btn-primary" (click)="selectGetFirst();" value="getFirst">先繞一圈獲勝</button>
         </div>
         <div class="d-inline mr-5">
-            <button #getScore class="buttonWidth btn-lg btn-primary" (click)="disabledFalse(); selectGetScore();">
+            <button #getScore class="buttonWidth btn-lg btn-primary" (click)="selectGetScore();" value="getScore">
                 獲得目標
-                <select [disabled]="isDisabled">
+                <select #scoreSelect [disabled]="isDisabled">
                     <option value="30" checked>30分</option>
                     <option value="50">50分</option>
                     <option value="70">70分</option>
@@ -19,5 +19,5 @@
         </div>
     </div>
 
-    <button class="btn-lg btn-success">開始遊戲</button>
+    <button class="btn-lg btn-success" (click)="startGameButton();">開始遊戲</button>
 </div>
