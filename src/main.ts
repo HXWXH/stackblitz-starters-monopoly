@@ -128,7 +128,8 @@ export class gameSetApp {
 @Component({
   selector: 'game-cell-work',
   standalone: true,
-  templateUrl: './template/html/gameCellWork.html'
+  templateUrl: './template/html/gameCellWork.html',
+  styleUrls: ['./template/css/gameCellWork.css']
 })
 export class gameCellWorkApp {
   winCondition: any;
@@ -143,6 +144,7 @@ export class gameCellWorkApp {
    handleWinConditionSelect(newData: string) {
     this.winCondition = newData;
   }
+
 
 }
 

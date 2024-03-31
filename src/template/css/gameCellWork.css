@@ -1,0 +1,34 @@
+* {
+    box-sizing: border-box;
+}
+
+.question {
+    background-color: rgb(240, 240, 240);
+}
+
+.destiny {
+    background-color: rgb(250, 235, 145);
+}
+
+.change {
+    background-color: rgb(250, 185, 200);
+}
+
+.circle-border-color {
+    border-color: rgb(237, 23, 63);
+    box-shadow: 0 0 5px 0 rgba(237, 23, 63, 0.6),
+    0 0 5px 0 rgb(0 ,0 ,0 );
+}
+
+.square-border-color {
+    border-color: rgb(0, 160, 233);
+    box-shadow: 0 0 5px 0 rgba(0, 160, 233, 1),
+    0 0 5px 0 rgb(0 ,0 ,0 );
+}
+
+.togeter-border-color {
+    border-color: rgb(255, 255, 255);
+    box-shadow:
+    inset 0 0 15px 5px rgb(255, 255, 255),
+    0 0 5px 0 rgb(0 ,0 ,0 );
+}
