@@ -198,6 +198,15 @@ export class gameCellWorkApp {
       answer: '比喻圓滿美好毫無缺陷的境界。'
     }]
 
+    changesAndDestiny = [
+      {class: 'change', content: '扶老奶奶過馬路，玩家前進格'},
+      {class: 'change', content: '在警察面前闖紅燈，玩家退格'},
+      {class: 'change', content: '踩到狗尾巴，玩家格'},
+      {class: 'destiny', content: '路上撿到500元，玩家加分'},
+      {class: 'destiny', content: '踩到狗大便，玩家扣分'},
+      {class: 'destiny', content: '遇到外星人，玩家'}
+    ]
+
   constructor(private dataService: DataService) {
     this.dataService.winConditionSelect.subscribe(data => {
       this.handleWinConditionSelect(data);
