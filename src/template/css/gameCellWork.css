@@ -2,15 +2,20 @@
     box-sizing: border-box;
 }
 
-.question {
+/* GAME CELL STYLE */
+.startcell {
+    background-color: rgb(200, 60, 60);
+}
+
+.questionCell {
     background-color: rgb(240, 240, 240);
 }
 
-.destiny {
+.destinyCell {
     background-color: rgb(250, 235, 145);
 }
 
-.change {
+.changeCell {
     background-color: rgb(250, 185, 200);
 }
 
@@ -29,6 +34,6 @@
 .togeter-border-color {
     border-color: rgb(255, 255, 255);
     box-shadow:
-    inset 0 0 15px 5px rgb(255, 255, 255),
+    inset 0 0 15px 0px rgb(255, 255, 255),
     0 0 5px 0 rgb(0 ,0 ,0 );
 }

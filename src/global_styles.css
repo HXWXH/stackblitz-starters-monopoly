@@ -22,22 +22,6 @@ body {
   width: 190px;
 }
 
-.circleCharacter {
-  position: absolute;
-  z-index: 2;
-  top: 33px;
-  left: 17px;
-  width: 60px;
-}
-
-.squareCharacter {
-  position: absolute;
-  z-index: 2;
-  top: 73px;
-  left: 58px;
-  width: 60px;
-}
-
 #dice1,
 #dice4 {
   width: 60px;
