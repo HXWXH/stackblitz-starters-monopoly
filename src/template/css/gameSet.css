@@ -1,6 +1,4 @@
 * {
-    margin: 0;
-    border: 0;
     box-sizing: border-box;
 }
 .gameSet {
@@ -12,9 +10,11 @@
     left: -85px;
     z-index: 5;
 }
+
 .line-height {
     line-height: 200px;
 }
+
 .buttonWidth {
     width: 300px;
 }
@@ -25,4 +25,40 @@
 
 .invisible {
     visibility: hidden;
+}
+
+/* GAME CELL STYLE */
+.startcell {
+    background-color: rgb(200, 60, 60);
+}
+
+.questionCell {
+    background-color: rgb(240, 240, 240);
+}
+
+.destinyCell {
+    background-color: rgb(250, 235, 145);
+}
+
+.changeCell {
+    background-color: rgb(250, 185, 200);
+}
+
+.circle-border-color {
+    border-color: rgb(237, 23, 63);
+    box-shadow: 0 0 5px 0 rgba(237, 23, 63, 0.6),
+    0 0 5px 0 rgb(0 ,0 ,0 );
+}
+
+.square-border-color {
+    border-color: rgb(0, 160, 233);
+    box-shadow: 0 0 5px 0 rgba(0, 160, 233, 1),
+    0 0 5px 0 rgb(0 ,0 ,0 );
+}
+
+.togeter-border-color {
+    border-color: rgb(255, 255, 255);
+    box-shadow:
+    inset 0 0 15px 0px rgb(255, 255, 255),
+    0 0 5px 0 rgb(0 ,0 ,0 );
 }

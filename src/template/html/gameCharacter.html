@@ -3,3 +3,10 @@
     <img #squareCharacter class="squareCharacter" src="assets/square.png" alt="square character" />
     <img #circleCharacter class="circleCharacter" src="assets/circle.png" alt="circle character" />
 </div>
+
+<!-- dice -->
+<div>
+    <button (click)="rollDice()" [disabled]="isButtonDisabled">
+        <img  class="rollDice" [src]="imageUrl" alt="roll-dice">
+    </button>
+</div>

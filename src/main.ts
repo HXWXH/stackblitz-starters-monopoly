@@ -26,12 +26,7 @@ export class DataService {
   }
 
   // 擲骰子-資料訂閱
-  private rollDiceNumSource = new BehaviorSubject<any>(null);
-  rollDiceNum = this.rollDiceNumSource.asObservable();
 
-  setRollDice(newData: any) {
-    this.rollDiceNumSource.next(newData);
-  }
 }
 
 
@@ -45,6 +40,8 @@ export class DataService {
 export class gameSetApp {
   message: any; // message用於存取component傳遞的資料
   selectWinCondition: any = {winCondition: 'getFirst', score: 'NaN'}; // 選擇勝利方式
+  cellSortToMonopoly:any = [];
+  cellCorrespondCellContentIndex = [0, 1, 2, 3, 4, 6, 8, 10, 15, 14, 13, 12, 11, 9, 7, 5]
 
   // get element ID "gameSetBoard"
   @ViewChild('gameSetBoard', {static: true}) gameSetBoard: ElementRef;
@@ -58,7 +55,7 @@ export class gameSetApp {
   // get select element ID "scoreSelect"
   @ViewChild('scoreSelect', {static: true}) scoreSelect: ElementRef;
 
-  constructor(private dataService: DataService) {
+  constructor(private dataService: DataService, private renderer: Renderer2, private elementRef: ElementRef) {
     this.dataService.winConditionSelect.subscribe(data => this.message = data);
     // 初始化一个空的 ElementRef
     this.gameSetBoard = {} as ElementRef;
@@ -124,30 +121,7 @@ export class gameSetApp {
     this.isDisabled = true;
   }
 
-  // 開始遊戲
-  startGameButton() {
-    // 獲取原生DOM元素
-    const getGameSetBoard = this.gameSetBoard.nativeElement;
 
-    // 隱藏gameSetBoard
-    getGameSetBoard.classList.add('invisible');
-
-    this.message = this.selectWinCondition;
-    this.dataService.setWinCondition(this.message);
-  }
-}
-
-
-// GAME CELL WORK
-@Component({
-  selector: 'game-cell-work',
-  standalone: true,
-  templateUrl: './template/html/gameCellWork.html',
-  styleUrls: ['./template/css/gameCellWork.css']
-})
-export class gameCellWorkApp {
-  winCondition: any; // 勝利條件儲存變數
-  
   // 格子內容
   cellContentData=[
     {
@@ -248,61 +222,73 @@ export class gameCellWorkApp {
     }
   ]
 
-  constructor(private dataService: DataService, private renderer: Renderer2, private elementRef: ElementRef) {
-    this.dataService.winConditionSelect.subscribe(data => {
-      this.handleWinConditionSelect(data);
-    });
-  }
 
-   // winConditionSource資料更改時執行
-   handleWinConditionSelect(newData: string) {
-    this.winCondition = newData;
+  // 開始遊戲
+  startGameButton() {
+    // 獲取原生DOM元素
+    const getGameSetBoard = this.gameSetBoard.nativeElement;
+
+    // 隱藏gameSetBoard
+    getGameSetBoard.classList.add('invisible');
+
+    this.message = this.selectWinCondition;
+    this.dataService.setWinCondition(this.message);
     this.gameCellRandom();
     this.getCellByClassAndAssign();
-    // 傳送亂序過的資料
+    // 增加一個obj到array第一個
+    this.cellContentData.unshift({class: 'startPoint', content: '', value: ''})
+    
+    // 將亂序的格子按照大富翁的格子順序排列 
+    for (const item of this.cellCorrespondCellContentIndex) {
+      this.cellSortToMonopoly.push(this.cellContentData[item]) 
+    }
+
+    this.cellContentData = this.cellSortToMonopoly;
+
+    //  傳送亂序過的資料
     this.dataService.setCellContent(this.cellContentData);
   }
 
-  // 獲取格子 Class Name 分配問題
-  getCellByClassAndAssign() {
-    const elements = this.elementRef.nativeElement.querySelectorAll('.cell');
-    for (let i = 1; i < elements.length; i++) {
-      this.isQuestion(this.cellContentData[i-1], elements[i]);
-      this.isChange(this.cellContentData[i-1], elements[i]);
-      this.isDestiny(this.cellContentData[i-1], elements[i]);
+    // 獲取格子 Class Name 分配問題
+    getCellByClassAndAssign() {
+      const elements = this.elementRef.nativeElement.querySelectorAll('.cell');
+      for (let i = 1; i < elements.length; i++) {
+        this.isQuestion(this.cellContentData[i-1], elements[i]);
+        this.isChange(this.cellContentData[i-1], elements[i]);
+        this.isDestiny(this.cellContentData[i-1], elements[i]);
+      }
     }
-  }
-
-  // 格子配對的問題與機會命運格會重新洗牌
-  gameCellRandom() {
-    // 隨機排序陣列內容
-    this.cellContentData.sort(() => Math.random() - 0.5);
-  }
-
-  // 確認class是question
-  isQuestion(cellContentData: any, element: any) {
-    if(cellContentData.class === 'question') {
-      element.classList.add('questionCell');
-      element.innerText = '問題';
+  
+    // 格子配對的問題與機會命運格會重新洗牌
+    gameCellRandom() {
+      // 隨機排序陣列內容
+      this.cellContentData.sort(() => Math.random() - 0.5);
     }
-  }
-
-  // 確認class是change
-  isChange(cellContentData: any, element: any) {
-    if(cellContentData.class === 'change') {
-      element.classList.add('changeCell');
-      element.innerText = '機會';
+  
+    // 確認class是question
+    isQuestion(cellContentData: any, element: any) {
+      if(cellContentData.class === 'question') {
+        element.classList.add('questionCell');
+        element.innerText = '問題';
+      }
     }
-  }
-
-  // 確認class是destiny
-  isDestiny(cellContentData: any, element: any) {
-    if(cellContentData.class === 'destiny') {
-      element.classList.add('destinyCell');
-      element.innerText = '命運';
+  
+    // 確認class是change
+    isChange(cellContentData: any, element: any) {
+      if(cellContentData.class === 'change') {
+        element.classList.add('changeCell');
+        element.innerText = '機會';
+      }
     }
-  }
-
+  
+    // 確認class是destiny
+    isDestiny(cellContentData: any, element: any) {
+      if(cellContentData.class === 'destiny') {
+        element.classList.add('destinyCell');
+        element.innerText = '命運';
+      }
+    }
+  
 }
 
 
@@ -315,52 +301,159 @@ export class gameCellWorkApp {
 })
 export class gameCharacterApp {
   cellContent: any; // 格子內容儲存變數
-  cellCorrespondCellContentIndex = [1, 2, 3, 4, 6, 8, 10, 15, 14, 13, 12, 11, 9, 7, 5, 16]
+  diceNum: any; // 儲存骰子的數值
+  whoTurn: string = 'circle'; // 誰的回合
+  circlePosition:any ; // 圓形位子
+  squarePosition:any ; // 方形位子
+  winCondition: any; // 勝利條件儲存變數
+  imageUrl: string; // 圖片Utl
+  run: any = 1; // 用於角色移動動畫
+  isButtonDisabled: boolean = false; // 按鈕 disable
+  // 玩家分數紀錄
+  charactersPositionSoreLog: any = [
+    {name: 'circle', currentPosition: '', score: ''},
+    {name: 'square', currentPosition: '', score: ''}
+  ]
+  
 
   // get element ID "squareCharacter"
   @ViewChild('squareCharacter', {static: true}) squareCharacter: ElementRef;
 
   // get element ID "circleCharacter"
   @ViewChild('circleCharacter', {static: true}) circleCharacter: ElementRef;
+  
+  // get element ID "dice"
+  @ViewChild('dice', {static: true}) dice: ElementRef;
 
   constructor(private dataService: DataService) {
+    this.imageUrl = 'assets/roll.png';
     this.squareCharacter = {} as ElementRef;
     this.circleCharacter = {} as ElementRef;
+    this.dice = {} as ElementRef;
 
-    // this.dataService.cellContent.subscribe(data => this.cellContent = data);
-    this.dataService.cellContent.subscribe(data => {
-      this.handle(data);
-    });
+    this.dataService.cellContent.subscribe(data => this.cellContent = data);
+    // this.dataService.cellContent.subscribe(data => {
+    //   this.handle(data);
+    // });
+
   }
 
-  handle(data:any) {
+  handleCharacters(data:any) {
     this.cellContent = data;
     this.circleCharacter.nativeElement.style.left = 17 + 2*123 + 'px';
+    console.log('GAME CHARACTER',this.cellContent);
   }
-
-  
-
-
-}
-
-
-// GAME DICE
-@Component({
-  selector: 'game-dice',
-  standalone: true,
-  templateUrl: './template/html/gameDice.html',
-  styleUrls: ['./template/css/gameDice.css']
-})
-export class gameDiceApp {
-  diceNum: any; 
-
-  constructor(private dataService: DataService) {
-    this.dataService.rollDiceNum.subscribe(data => this.diceNum = data);
-  }
-
-  winCondition: any; // 勝利條件儲存變數
 
   rollDice() {
+    const randomInt = Math.floor(Math.random() * 6) + 1; // 隨機數值1~6
+    this.diceNum = randomInt;
+    this.imageUrl = 'assets/dice' + this.diceNum + '.png'; // 置入diceNum，用於圖片致換
+    this.isButtonDisabled = true; // disable 按鈕
+    
+    this.run = 1;
+
+    // 回合轉換
+    this.whoTurn === 'circle' ? this.circleTurn(this.diceNum) : this.squareTurn(this.diceNum);
+
+
+  }
+
+  circleTurn(diceNum: any) {
+    // 測試
+    console.log('circle');
+    console.log(diceNum);
+    this.whoTurn = 'square';
+
+    this.cellPositionLog(this.circleCharacter, this.diceNum) ;
+  }
+
+  squareTurn(diceNum: any) {
+    // 測試
+    console.log('square');
+    console.log(diceNum);
+
+    this.cellPositionLog(this.squareCharacter, this.diceNum) ;
+    this.whoTurn = 'circle';
+  }
+
+  runRight(character: any, diceNum: any) {
+    // 移動動畫
+    if (this.run > this.diceNum) {
+      setTimeout(() => {
+      this.isButtonDisabled = false; // active 按鈕
+      this.imageUrl = 'assets/roll.png'; // 置入roll，用於圖片致換
+      }, 500);
+      return
+    } else {
+      setTimeout(() => {
+      character.nativeElement.style.transition = ".3s";
+      character.nativeElement.style.transform = 'translateX(' + this.run * 123 + 'px)';
+      this.run += 1;
+      this.cellPositionLog(character, diceNum);
+      }, 500);
+    }
+  }
+
+  runLeft(character: any, diceNum: any) {
+    // 移動動畫
+    if (this.run > this.diceNum) {
+      setTimeout(() => {
+      this.isButtonDisabled = false; // active 按鈕
+      this.imageUrl = 'assets/roll.png'; // 置入roll，用於圖片致換
+      }, 500);
+      return
+    } else {
+      setTimeout(() => {
+      character.nativeElement.style.transition = ".3s";
+      character.nativeElement.style.transform = 'translateX(' + this.run * -123 + 'px)';
+      this.run += 1;
+      this.cellPositionLog(character, diceNum);
+      }, 500);
+    }
+  }
+
+  runUp(character: any, diceNum: any) {
+    // 移動動畫
+    if (this.run > this.diceNum) {
+      setTimeout(() => {
+      this.isButtonDisabled = false; // active 按鈕
+      this.imageUrl = 'assets/roll.png'; // 置入roll，用於圖片致換
+      }, 500);
+      return
+    } else {
+      setTimeout(() => {
+      character.nativeElement.style.transition = ".3s";
+      character.nativeElement.style.transform = 'translateY(' + this.run * -123 + 'px)';
+      this.run += 1;
+      this.cellPositionLog(character, diceNum);
+      }, 500);
+    }
+  }
+
+  runDown(character: any, diceNum: any) {
+    // 移動動畫
+    if (this.run > this.diceNum) {
+      setTimeout(() => {
+      this.isButtonDisabled = false; // active 按鈕
+      this.imageUrl = 'assets/roll.png'; // 置入roll，用於圖片致換
+      }, 500);
+      return
+    } else {
+      setTimeout(() => {
+      character.nativeElement.style.transition = ".3s";
+      character.nativeElement.style.transform = 'translateY(' + this.run * 123 + 'px)';
+      this.run += 1;
+      this.cellPositionLog(character, diceNum);
+      }, 500);
+    }
+  }
+
+  time: any = 1000;
+  // log circle and square position
+  cellPositionLog(character: any, diceNum: any) {
+
+    this.runRight(character, diceNum);
+    
   }
 
 }
@@ -370,12 +463,10 @@ export class gameDiceApp {
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [gameSetApp, gameCellWorkApp, gameCharacterApp, gameDiceApp],
+  imports: [gameSetApp, gameCharacterApp],
   template: `
     <game-set></game-set>
-    <game-cell-work></game-cell-work>
     <game-character></game-character>
-    <game-dice></game-dice>
   `
 })
 export class AppComponent {}
