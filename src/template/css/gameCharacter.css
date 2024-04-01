@@ -1,8 +1,8 @@
 .circleCharacter {
     position: absolute;
     z-index: 2;
-    top: 33px;
-    left: 17px;
+    top: 33px; /*move+123*/
+    left: 17px; /*move+123*/
     width: 60px;
 
     filter: drop-shadow(0 0 3px white);
@@ -11,8 +11,8 @@
   .squareCharacter {
     position: absolute;
     z-index: 2;
-    top: 73px;
-    left: 58px;
+    top: 73px; /*move+123*/
+    left: 58px; /*move+123*/
     width: 60px;
 
     filter: drop-shadow(0 0 3px white);

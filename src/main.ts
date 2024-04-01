@@ -15,8 +15,22 @@ export class DataService {
 
   setWinCondition(newData: any) {
     this.winConditionSource.next(newData);
+  }
 
-  //  XXX-資料訂閱
+  // 格子內容-資料訂閱
+  private cellContentSource = new BehaviorSubject<any>(null);
+  cellContent = this.cellContentSource.asObservable();
+
+  setCellContent(newData: any) {
+    this.cellContentSource.next(newData);
+  }
+
+  // 擲骰子-資料訂閱
+  private rollDiceNumSource = new BehaviorSubject<any>(null);
+  rollDiceNum = this.rollDiceNumSource.asObservable();
+
+  setRollDice(newData: any) {
+    this.rollDiceNumSource.next(newData);
   }
 }
 
@@ -245,7 +259,8 @@ export class gameCellWorkApp {
     this.winCondition = newData;
     this.gameCellRandom();
     this.getCellByClassAndAssign();
-    console.log(this.cellContentData);
+    // 傳送亂序過的資料
+    this.dataService.setCellContent(this.cellContentData);
   }
 
   // 獲取格子 Class Name 分配問題
@@ -269,9 +284,7 @@ export class gameCellWorkApp {
     if(cellContentData.class === 'question') {
       element.classList.add('questionCell');
       element.innerText = '問題';
-      return 
     }
-      return
   }
 
   // 確認class是change
@@ -279,9 +292,7 @@ export class gameCellWorkApp {
     if(cellContentData.class === 'change') {
       element.classList.add('changeCell');
       element.innerText = '機會';
-      return 
     }
-      return
   }
 
   // 確認class是destiny
@@ -289,9 +300,7 @@ export class gameCellWorkApp {
     if(cellContentData.class === 'destiny') {
       element.classList.add('destinyCell');
       element.innerText = '命運';
-      return 
     }
-      return
   }
 
 }
@@ -305,8 +314,54 @@ export class gameCellWorkApp {
   styleUrls: ['./template/css/gameCharacter.css']
 })
 export class gameCharacterApp {
+  cellContent: any; // 格子內容儲存變數
+  cellCorrespondCellContentIndex = [1, 2, 3, 4, 6, 8, 10, 15, 14, 13, 12, 11, 9, 7, 5, 16]
+
+  // get element ID "squareCharacter"
+  @ViewChild('squareCharacter', {static: true}) squareCharacter: ElementRef;
+
+  // get element ID "circleCharacter"
+  @ViewChild('circleCharacter', {static: true}) circleCharacter: ElementRef;
+
+  constructor(private dataService: DataService) {
+    this.squareCharacter = {} as ElementRef;
+    this.circleCharacter = {} as ElementRef;
+
+    // this.dataService.cellContent.subscribe(data => this.cellContent = data);
+    this.dataService.cellContent.subscribe(data => {
+      this.handle(data);
+    });
+  }
+
+  handle(data:any) {
+    this.cellContent = data;
+    this.circleCharacter.nativeElement.style.left = 17 + 2*123 + 'px';
+  }
+
+  
+
+
+}
+
+
+// GAME DICE
+@Component({
+  selector: 'game-dice',
+  standalone: true,
+  templateUrl: './template/html/gameDice.html',
+  styleUrls: ['./template/css/gameDice.css']
+})
+export class gameDiceApp {
+  diceNum: any; 
+
+  constructor(private dataService: DataService) {
+    this.dataService.rollDiceNum.subscribe(data => this.diceNum = data);
+  }
+
   winCondition: any; // 勝利條件儲存變數
 
+  rollDice() {
+  }
 
 }
 
@@ -315,11 +370,12 @@ export class gameCharacterApp {
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [gameSetApp, gameCellWorkApp, gameCharacterApp],
+  imports: [gameSetApp, gameCellWorkApp, gameCharacterApp, gameDiceApp],
   template: `
     <game-set></game-set>
     <game-cell-work></game-cell-work>
     <game-character></game-character>
+    <game-dice></game-dice>
   `
 })
 export class AppComponent {}

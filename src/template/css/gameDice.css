@@ -1,0 +1,14 @@
+.rollDice {
+    position: absolute;
+    z-index: 2;
+    top: 256px;
+    left: 244px;
+    width: 140px;
+    cursor: pointer;
+  }
+  
+  .rollDice:hover {
+    filter:drop-shadow(0 0 30px rgb(229, 248, 56)) ;
+    transform: scale(1.06);
+    transition: .15s;
+  }
