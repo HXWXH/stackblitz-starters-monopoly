@@ -1,45 +1,44 @@
 .circleCharacter {
-    position: absolute;
-    z-index: 2;
-    top: 33px; /*move+123*/
-    left: 17px; /*move+123*/
-    width: 60px;
+  position: absolute;
+  z-index: 2;
+  top: 33px; /*move+123*/
+  left: 17px; /*move+123*/
+  width: 60px;
 
-    filter: drop-shadow(0 0 3px white);
-  }
-  
-  .squareCharacter {
-    position: absolute;
-    z-index: 2;
-    top: 73px; /*move+123*/
-    left: 58px; /*move+123*/
-    width: 60px;
+  filter: drop-shadow(0 0 3px white);
+}
 
-    filter: drop-shadow(0 0 3px white);
-  }
+.squareCharacter {
+  position: absolute;
+  z-index: 2;
+  top: 73px; /*move+123*/
+  left: 58px; /*move+123*/
+  width: 60px;
 
-  .yourTurn {
-    z-index: 3;
-  }
+  filter: drop-shadow(0 0 3px white);
+}
 
-  .rollDice {
-    position: absolute;
-    z-index: 2;
-    top: 256px;
-    left: 244px;
-    width: 140px;
-    cursor: pointer;
-  }
-  
-  .rollDice:hover {
-    filter:drop-shadow(0 0 30px rgb(229, 248, 56)) ;
-    transform: scale(1.06);
-    transition: .15s;
-  }
+.yourTurn {
+  z-index: 3;
+}
 
-  button {
-    border: none;
-    background: transparent;
-    padding: 0;
-  }
-  
+.rollDice {
+  position: absolute;
+  z-index: 2;
+  top: 256px;
+  left: 244px;
+  width: 140px;
+  cursor: pointer;
+}
+
+.rollDice:hover {
+  filter:drop-shadow(0 0 30px rgb(229, 248, 56)) ;
+  transform: scale(1.06);
+  transition: .15s;
+}
+
+button {
+  border: none;
+  background: transparent;
+  padding: 0;
+}

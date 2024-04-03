@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild, Injectable, Renderer2} from '@angular/core';
+import { Component, ElementRef, ViewChild, Injectable, Renderer2, AfterViewChecked } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import 'zone.js';
 import { makeBindingParser } from '@angular/compiler';
@@ -26,6 +26,12 @@ export class DataService {
   }
 
   // 擲骰子-資料訂閱
+  private charactersPositionSource = new BehaviorSubject<any>(null);
+  charactersPosition = this.cellContentSource.asObservable();
+
+  getCharactersPosition(newData: any) {
+    this.charactersPositionSource.next(newData);
+  }
 
 }
 
@@ -306,15 +312,14 @@ export class gameCharacterApp {
   circlePosition:any ; // 圓形位子
   squarePosition:any ; // 方形位子
   winCondition: any; // 勝利條件儲存變數
-  imageUrl: string; // 圖片Utl
-  run: any = 1; // 用於角色移動動畫
+  imageUrl: string; // 圖片Url
+  run: any = 0; // 用於角色移動動畫
   isButtonDisabled: boolean = false; // 按鈕 disable
   // 玩家分數紀錄
   charactersPositionSoreLog: any = [
-    {name: 'circle', currentPosition: '', score: ''},
-    {name: 'square', currentPosition: '', score: ''}
+    {name: 'circle', currentPosition: 0, score: 0},
+    {name: 'square', currentPosition: 0, score: 0}
   ]
-  
 
   // get element ID "squareCharacter"
   @ViewChild('squareCharacter', {static: true}) squareCharacter: ElementRef;
@@ -331,12 +336,14 @@ export class gameCharacterApp {
     this.circleCharacter = {} as ElementRef;
     this.dice = {} as ElementRef;
 
+    // 格子內容 問題、命運、機會
     this.dataService.cellContent.subscribe(data => this.cellContent = data);
     // this.dataService.cellContent.subscribe(data => {
     //   this.handle(data);
     // });
 
   }
+
 
   handleCharacters(data:any) {
     this.cellContent = data;
@@ -356,27 +363,39 @@ export class gameCharacterApp {
     this.whoTurn === 'circle' ? this.circleTurn(this.diceNum) : this.squareTurn(this.diceNum);
 
 
+    // 測試
+    // let circleCharacterPositiion =  this.circleCharacter.nativeElement.getBoundingClientRect();
+    // console.log('circls posiiton = ',circleCharacterPositiion.x);
+    // let circleCharacterPosition = this.circleCharacter.nativeElement.getBoundingClientRect();
+    // console.log('circleCharacterPosition left = ',circleCharacterPosition.x);
+    // this.circleCharacter.nativeElement.style.left = circleCharacterPosition.x;
+
   }
 
   circleTurn(diceNum: any) {
     // 測試
-    console.log('circle');
-    console.log(diceNum);
+    console.log('circle turn');
+    console.log('Dice Number =', diceNum);
     this.whoTurn = 'square';
-
-    this.cellPositionLog(this.circleCharacter, this.diceNum) ;
+    this.cellPositionLog(this.circleCharacter, this.diceNum, this.charactersPositionSoreLog[0]) ;
   }
 
   squareTurn(diceNum: any) {
     // 測試
     console.log('square');
     console.log(diceNum);
-
-    this.cellPositionLog(this.squareCharacter, this.diceNum) ;
     this.whoTurn = 'circle';
-  }
 
-  runRight(character: any, diceNum: any) {
+
+    this.cellPositionLog(this.squareCharacter, this.diceNum, this.charactersPositionSoreLog[1]) ;
+  }
+  // 測試
+  num: number = 0;
+  runRight(character: any, diceNum: any, charactersPositionSoreLog: any) {
+    // 判斷位置
+    // if (this.num > 2) {
+    //   return;
+    // }
     // 移動動畫
     if (this.run > this.diceNum) {
       setTimeout(() => {
@@ -387,14 +406,18 @@ export class gameCharacterApp {
     } else {
       setTimeout(() => {
       character.nativeElement.style.transition = ".3s";
-      character.nativeElement.style.transform = 'translateX(' + this.run * 123 + 'px)';
+      // 獲取目標元素左邊框與父元素的左邊框的距離
+      let characterPosition = character.nativeElement.offsetLeft;
+      character.nativeElement.style.left = characterPosition + 123 +'px';
       this.run += 1;
-      this.cellPositionLog(character, diceNum);
+      // test
+      // console.log('num',this.num);
+      this.cellPositionLog(character, diceNum, charactersPositionSoreLog);
       }, 500);
     }
   }
 
-  runLeft(character: any, diceNum: any) {
+  runLeft(character: any, diceNum: any, charactersPositionSoreLog: any) {
     // 移動動畫
     if (this.run > this.diceNum) {
       setTimeout(() => {
@@ -405,14 +428,16 @@ export class gameCharacterApp {
     } else {
       setTimeout(() => {
       character.nativeElement.style.transition = ".3s";
-      character.nativeElement.style.transform = 'translateX(' + this.run * -123 + 'px)';
+      // 獲取目標元素左邊框與父元素的左邊框的距離
+      let characterPosition = character.nativeElement.offsetLeft;
+      character.nativeElement.style.left = characterPosition - 123 +'px';
       this.run += 1;
-      this.cellPositionLog(character, diceNum);
+      this.cellPositionLog(character, diceNum, charactersPositionSoreLog);
       }, 500);
     }
   }
 
-  runUp(character: any, diceNum: any) {
+  runUp(character: any, diceNum: any, charactersPositionSoreLog: any) {
     // 移動動畫
     if (this.run > this.diceNum) {
       setTimeout(() => {
@@ -423,14 +448,20 @@ export class gameCharacterApp {
     } else {
       setTimeout(() => {
       character.nativeElement.style.transition = ".3s";
-      character.nativeElement.style.transform = 'translateY(' + this.run * -123 + 'px)';
+      // 獲取目標元素左邊框與父元素的左邊框的距離
+      let characterPosition = character.nativeElement.offsetTop;
+      character.nativeElement.style.top = characterPosition - 123 +'px';
       this.run += 1;
-      this.cellPositionLog(character, diceNum);
+      this.cellPositionLog(character, diceNum, charactersPositionSoreLog);
       }, 500);
     }
   }
 
-  runDown(character: any, diceNum: any) {
+  runDown(character: any, diceNum: any, charactersPositionSoreLog: any) {
+    // 判斷位置
+    // if (this.num > 4 && this.num < 8) {
+    //   return;
+    // }
     // 移動動畫
     if (this.run > this.diceNum) {
       setTimeout(() => {
@@ -441,23 +472,53 @@ export class gameCharacterApp {
     } else {
       setTimeout(() => {
       character.nativeElement.style.transition = ".3s";
-      character.nativeElement.style.transform = 'translateY(' + this.run * 123 + 'px)';
+      // 獲取目標元素左邊框與父元素的左邊框的距離
+      let characterPosition = character.nativeElement.offsetTop;
+      character.nativeElement.style.top = characterPosition + 123 +'px';
       this.run += 1;
-      this.cellPositionLog(character, diceNum);
+      // test
+      // console.log('num',this.num);
+      this.cellPositionLog(character, diceNum, charactersPositionSoreLog);
       }, 500);
     }
   }
 
   time: any = 1000;
   // log circle and square position
-  cellPositionLog(character: any, diceNum: any) {
+  cellPositionLog(character: any, diceNum: any, charactersPositionSoreLog: any) {
 
-    this.runRight(character, diceNum);
+    // 判斷是否還在回合內，如果為否位置不能+1
+    if ((this.diceNum - this.run) !== -1) {
+      charactersPositionSoreLog.currentPosition += 1;
+    console.log('currentPosition:',charactersPositionSoreLog.currentPosition);
+    }
+
+   // 判斷位置
+    if ((charactersPositionSoreLog.currentPosition >= 0) && (charactersPositionSoreLog.currentPosition < 5)) {
+      // console.log('num',this.num);
+      this.runRight(character, diceNum, charactersPositionSoreLog);
+    }
+    if ((charactersPositionSoreLog.currentPosition >= 5) && (charactersPositionSoreLog.currentPosition < 9)) {
+      // console.log('num',this.num);
+      this.runDown(character, diceNum, charactersPositionSoreLog);
+    }
+    if ((charactersPositionSoreLog.currentPosition >= 9) && (charactersPositionSoreLog.currentPosition < 13)) {
+      // console.log('num',this.num);
+      this.runLeft(character, diceNum, charactersPositionSoreLog);
+    }
+    if ((charactersPositionSoreLog.currentPosition >= 13) && (charactersPositionSoreLog.currentPosition < 17)) {
+      console.log('num',charactersPositionSoreLog);
+      this.runUp(character, diceNum, charactersPositionSoreLog);
+      if (charactersPositionSoreLog.currentPosition === 16){
+        charactersPositionSoreLog.currentPosition = 0;
+      } 
+    }
+
+    
     
   }
 
 }
-
 
 // Composite components
 @Component({
