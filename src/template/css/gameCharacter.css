@@ -42,3 +42,50 @@ button {
   background: transparent;
   padding: 0;
 }
+
+
+/*  game question change destiny */
+.monopolyEvent {
+  position: absolute;
+  width: 800px;
+  min-height: 300px;
+  background-color: white;
+  top: 120px;
+  left: -85px;
+  z-index: 5;
+}
+
+.line-height {
+  line-height: 200px;
+}
+
+.buttonWidth {
+  
+  min-width: 200px;
+  text-align: center;
+  background: green;
+  overflow-wrap: break-word;
+}
+
+.test {
+  height: 100%;
+
+}
+
+.buttonWidth p {
+  margin: 0;
+}
+
+.selectBorder {
+  box-shadow: 0 0 0 10px rgb(100, 220, 100);
+}
+
+
+
+.invisible {
+  visibility: hidden;
+}
+
+.displayNone {
+  display: none;
+}

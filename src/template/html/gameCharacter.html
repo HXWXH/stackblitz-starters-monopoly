@@ -1,3 +1,23 @@
+<!-- game question change destiny -->
+<div #monopolyEvent class="monopolyEvent invisible d-flex flex-column justify-content-between align-items-center p-5 border bg-white border-info rounded shadow-lg">
+    <h1 class="mb-5">{{ class }}</h1>
+    <div #monopolyBtn>
+        <h3 class="mb-5">{{ question }}</h3>
+
+        <div class="d-flex flex-row justify-content-around align-items-center mb-5">
+            <button #btn1 class="buttonWidth p-4 btn-lg btn-primary test ml-4 mr-4" value="{{ option1 }}" (click)="answer(btn1.value);" [disabled]="AnswerButtonDisabled"><p>{{ option1 }}</p></button>
+            <button #btn2 class="buttonWidth p-4 btn-lg btn-primary test ml-4 mr-4" value="{{ option2 }}" (click)="answer(btn2.value);" [disabled]="AnswerButtonDisabled"><p>{{ option2 }}</p></button>
+            <button #btn3 class="buttonWidth p-4 btn-lg btn-primary test ml-4 mr-4" value="{{ option3 }}" (click)="answer(btn3.value);" [disabled]="AnswerButtonDisabled"><p>{{ option3 }}</p></button>
+        </div>
+    </div>
+    <div #monopolyContent>
+        <h3 class="mb-5">{{ content }}</h3>
+    </div>
+    <div #checkAnswer>
+        <h3>{{ value }}</h3>
+    </div>
+</div>
+
 <!-- character -->
 <div class="character">
     <img #squareCharacter class="squareCharacter" src="assets/square.png" alt="square character" />
