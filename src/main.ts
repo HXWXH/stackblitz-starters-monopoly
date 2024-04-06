@@ -3,6 +3,7 @@ import { bootstrapApplication } from '@angular/platform-browser';
 import 'zone.js';
 import { makeBindingParser } from '@angular/compiler';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { style } from '@angular/animations';
 
 
 @Injectable({
@@ -26,15 +27,26 @@ export class DataService {
   }
 
   // 擲骰子-資料訂閱
-  private charactersPositionSource = new BehaviorSubject<any>(null);
-  charactersPosition = this.cellContentSource.asObservable();
+  private charactersDataLogSource = new BehaviorSubject<any>(null);
+  charactersDataLog = this.charactersDataLogSource.asObservable();
 
-  getCharactersPosition(newData: any) {
-    this.charactersPositionSource.next(newData);
+  setCharactersDataLog(newData: any) {
+    this.charactersDataLogSource.next(newData);
   }
 
 }
 
+
+// GAME BANNER
+@Component({
+  selector: 'game-banner',
+  standalone: true,
+  templateUrl: './template/html/gameBanner.html',
+  styleUrls: ['./template/css/gameBanner.css']
+})
+export class gameBannerApp {
+
+}
 
 // SELECT WIN CONDITION
 @Component({
@@ -45,7 +57,7 @@ export class DataService {
 })
 export class gameSetApp {
   message: any; // message用於存取component傳遞的資料
-  selectWinCondition: any = {winCondition: 'getFirst', score: 'NaN'}; // 選擇勝利方式
+  selectWinCondition: any = {winCondition: 'getFirst', score: 'NaN', restart: 'false'}; // 選擇勝利方式
   cellSortToMonopoly:any = [];
   cellCorrespondCellContentIndex = [0, 1, 2, 3, 4, 6, 8, 10, 15, 14, 13, 12, 11, 9, 7, 5]
 
@@ -62,7 +74,10 @@ export class gameSetApp {
   @ViewChild('scoreSelect', {static: true}) scoreSelect: ElementRef;
 
   constructor(private dataService: DataService, private renderer: Renderer2, private elementRef: ElementRef) {
-    this.dataService.winConditionSelect.subscribe(data => this.message = data);
+    this.dataService.winConditionSelect.subscribe(data => {
+      this.message = data;
+      this.winConditionFunction(data);
+    });
     // 初始化一个空的 ElementRef
     this.gameSetBoard = {} as ElementRef;
     this.getFirst = {} as ElementRef;
@@ -74,6 +89,19 @@ export class gameSetApp {
     const getFirstButton = this.getFirst.nativeElement;
 
     getFirstButton.classList.add('selectBorder');
+  }
+
+  winConditionFunction(data: any) {
+
+    this.message = data;
+    if (this.message.winCondition == "againGame") {
+      this.gameSetBoard.nativeElement.classList.remove('invisible');
+      this.message.winCondition = 'getFirst';
+      this.cellSortToMonopoly = [];
+      console.log('cellContentData = ',this.cellContentData);
+      // 格子內容
+     
+    }
   }
 
   selectGetFirst() {
@@ -275,6 +303,8 @@ export class gameSetApp {
     isQuestion(cellContentData: any, element: any) {
       if(cellContentData.class === '問題') {
         element.classList.add('questionCell');
+        element.classList.remove('changeCell');
+        element.classList.remove('destinyCell');
         element.innerText = '問題';
       }
     }
@@ -283,6 +313,8 @@ export class gameSetApp {
     isChange(cellContentData: any, element: any) {
       if(cellContentData.class === '機會') {
         element.classList.add('changeCell');
+        element.classList.remove('questionCell');
+        element.classList.remove('destinyCell');
         element.innerText = '機會';
       }
     }
@@ -291,6 +323,8 @@ export class gameSetApp {
     isDestiny(cellContentData: any, element: any) {
       if(cellContentData.class === '命運') {
         element.classList.add('destinyCell');
+        element.classList.remove('questionCell');
+        element.classList.remove('changeCell');
         element.innerText = '命運';
       }
     }
@@ -326,8 +360,8 @@ export class gameCharacterApp {
   value: any;
   // 玩家分數紀錄
   charactersPositionSoreLog: any = [
-    {name: 'circle', currentPosition: 0, score: 0},
-    {name: 'square', currentPosition: 0, score: 0}
+    {name: 'circle', currentPosition: 0, score: 0, getFirst: 0},
+    {name: 'square', currentPosition: 0, score: 0, getFirst: 0}
   ]
 
   // get element ID "squareCharacter"
@@ -375,6 +409,34 @@ export class gameCharacterApp {
   
     // 格子內容 問題、命運、機會
     this.dataService.cellContent.subscribe(data => this.cellContent = data);
+
+    // 
+   
+
+    // 獲勝條件
+    this.dataService.winConditionSelect.subscribe(data => {
+      this.winCondition = data;
+      this.winConditionFunction(data);
+     
+    });
+
+  }
+
+  winConditionFunction(data:any) {
+    if (data.restart == 'true') {
+      data.restart = 'false';
+      this.squareCharacter.nativeElement.style.left = '58px';
+      this.squareCharacter.nativeElement.style.top = '73px';
+      this.circleCharacter.nativeElement.style.left = '17px';
+      this.circleCharacter.nativeElement.style.top = '33px';
+      // 勝利條件
+      this.dataService.setWinCondition(data);
+      this.charactersPositionSoreLog = [
+        {name: 'circle', currentPosition: 0, score: 0, getFirst: 0},
+        {name: 'square', currentPosition: 0, score: 0, getFirst: 0}
+      ];
+      this.whoTurn = 'circle';
+    }
   }
 
   rollDice() {
@@ -415,19 +477,11 @@ export class gameCharacterApp {
 
     this.cellPositionLog(this.squareCharacter, this.diceNum, this.charactersPositionSoreLog[1]) ;
   }
-  // 測試
-  num: number = 0;
+  
   runRight(character: any, diceNum: any, charactersPositionSoreLog: any) {
-    // 判斷位置
-    // if (this.num > 2) {
-    //   return;
-    // }
+
     // 移動動畫
     if (this.run > this.diceNum) {
-      // setTimeout(() => {
-      // this.isButtonDisabled = false; // active 按鈕
-      // this.imageUrl = 'assets/roll.png'; // 置入roll，用於圖片致換
-      // }, 500);
       return
     } else {
       setTimeout(() => {
@@ -446,10 +500,6 @@ export class gameCharacterApp {
   runLeft(character: any, diceNum: any, charactersPositionSoreLog: any) {
     // 移動動畫
     if (this.run > this.diceNum) {
-      // setTimeout(() => {
-      // this.isButtonDisabled = false; // active 按鈕
-      // this.imageUrl = 'assets/roll.png'; // 置入roll，用於圖片致換
-      // }, 500);
       return
     } else {
       setTimeout(() => {
@@ -466,10 +516,6 @@ export class gameCharacterApp {
   runUp(character: any, diceNum: any, charactersPositionSoreLog: any) {
     // 移動動畫
     if (this.run > this.diceNum) {
-      // setTimeout(() => {
-      // this.isButtonDisabled = false; // active 按鈕
-      // this.imageUrl = 'assets/roll.png'; // 置入roll，用於圖片致換
-      // }, 500);
       return
     } else {
       setTimeout(() => {
@@ -484,16 +530,9 @@ export class gameCharacterApp {
   }
 
   runDown(character: any, diceNum: any, charactersPositionSoreLog: any) {
-    // 判斷位置
-    // if (this.num > 4 && this.num < 8) {
-    //   return;
-    // }
+
     // 移動動畫
     if (this.run > this.diceNum) {
-      // setTimeout(() => {
-      // this.isButtonDisabled = false; // active 按鈕
-      // this.imageUrl = 'assets/roll.png'; // 置入roll，用於圖片致換
-      // }, 500);
       return
     } else {
       setTimeout(() => {
@@ -518,16 +557,11 @@ export class gameCharacterApp {
     console.log('currentPosition:',charactersPositionSoreLog.currentPosition);
     } else {
 
-  // class: any;
-  // question: any;
-  // option: any;
-  // content: any;
-  // value: any;
-
       // 配置cell觸發事件
       if (this.cellContent[charactersPositionSoreLog.currentPosition].class == "問題") {
         this.monopolyContent.nativeElement.classList.add('displayNone');
         this.monopolyBtn.nativeElement.classList.remove('displayNone');
+        this.checkAnswer.nativeElement.classList.remove('displayNone');
         this.class = this.cellContent[charactersPositionSoreLog.currentPosition].class;
         this.question = this.cellContent[charactersPositionSoreLog.currentPosition].question;
         this.option1 = this.cellContent[charactersPositionSoreLog.currentPosition].options[0];
@@ -535,10 +569,11 @@ export class gameCharacterApp {
         this.option3 = this.cellContent[charactersPositionSoreLog.currentPosition].options[2];
         this.content = '';
         this.value = '';
-        this.endMove();
+        this.endMove(charactersPositionSoreLog);
       } else if((this.cellContent[charactersPositionSoreLog.currentPosition].class == "命運")||(this.cellContent[charactersPositionSoreLog.currentPosition].class == "機會")) {
         this.monopolyBtn.nativeElement.classList.add('displayNone');
         this.monopolyContent.nativeElement.classList.remove('displayNone');
+        this.checkAnswer.nativeElement.classList.add('displayNone');
         this.class = this.cellContent[charactersPositionSoreLog.currentPosition].class;
         this.question = '';
         this.option1 = '';
@@ -546,53 +581,63 @@ export class gameCharacterApp {
         this.option3 = '';
         this.content = this.cellContent[charactersPositionSoreLog.currentPosition].content;
         this.value = this.cellContent[charactersPositionSoreLog.currentPosition].value;
+        
+        // 確認是誰的回合
+        let whoAnswerTurn:any ; 
+        this.whoTurn == 'square' ?
+        whoAnswerTurn = this.charactersPositionSoreLog[0]:
+        whoAnswerTurn = this.charactersPositionSoreLog[1];
+
+        whoAnswerTurn.score +=  parseInt(this.cellContent[whoAnswerTurn.currentPosition].value, 10);
+        
         this.closeMonopolyEventWindow(2500);
-        this.endMove();
+        this.endMove(charactersPositionSoreLog);
       } else {
         setTimeout(() => {
           this.isButtonDisabled = false; // active 按鈕
         this.imageUrl = 'assets/roll.png'; // 置入roll，用於圖片致換
+        this.sendCharactersDataLog();
         },500);
       }
-
-      
 
       console.log('cellContent=',this.cellContent);
     }
 
-   // 判斷位置
+   // 判斷玩家位置
     if ((charactersPositionSoreLog.currentPosition >= 0) && (charactersPositionSoreLog.currentPosition < 5)) {
-      // console.log('num',this.num);
       this.runRight(character, diceNum, charactersPositionSoreLog);
     }
     if ((charactersPositionSoreLog.currentPosition >= 5) && (charactersPositionSoreLog.currentPosition < 9)) {
-      // console.log('num',this.num);
       this.runDown(character, diceNum, charactersPositionSoreLog);
     }
     if ((charactersPositionSoreLog.currentPosition >= 9) && (charactersPositionSoreLog.currentPosition < 13)) {
-      // console.log('num',this.num);
       this.runLeft(character, diceNum, charactersPositionSoreLog);
     }
     if ((charactersPositionSoreLog.currentPosition >= 13) && (charactersPositionSoreLog.currentPosition < 17)) {
       console.log('num',charactersPositionSoreLog);
       this.runUp(character, diceNum, charactersPositionSoreLog);
-      if (charactersPositionSoreLog.currentPosition === 16){
+      if ((charactersPositionSoreLog.currentPosition === 16) && (this.winCondition.winCondition == 'getFirst')){
         charactersPositionSoreLog.currentPosition = 0;
-      } 
+        // 停止移動
+        this.run = this.diceNum ;
+      }
+      if((charactersPositionSoreLog.currentPosition === 16) && (this.winCondition.winCondition == 'getScore')){
+        charactersPositionSoreLog.currentPosition = 0;
+      }
     }
   }
 
+  // 點擊選擇答案後觸發
   answer(answer: any) {
   
     // 確認是誰的回合
     let whoAnswerTurn:any ; 
     this.whoTurn == 'square' ?
     whoAnswerTurn = this.charactersPositionSoreLog[0]:
-    whoAnswerTurn = this.charactersPositionSoreLog[1] ;
+    whoAnswerTurn = this.charactersPositionSoreLog[1];
+
 
     this.AnswerButtonDisabled = true;
-    // whoAnswerTurn = this.cellContent[this.charactersPositionSoreLog[0].currentPosition] :
-    // whoAnswerTurn = this.cellContent[this.charactersPositionSoreLog[1].currentPosition] ;
 
     if (answer == this.cellContent[whoAnswerTurn.currentPosition].answer) {
       whoAnswerTurn.score += 5;
@@ -608,30 +653,260 @@ export class gameCharacterApp {
   closeMonopolyEventWindow(delayTime: number) {
     setTimeout(() => {
       this.monopolyEvent.nativeElement.classList.add('invisible');
+      this.sendCharactersDataLog();
     }, delayTime);
   }
 
-  endMove() {
+  endMove(charactersPosition: any) {
     setTimeout(() => {
       this.monopolyEvent.nativeElement.classList.remove('invisible');
       this.isButtonDisabled = false; // active 按鈕
       this.imageUrl = 'assets/roll.png'; // 置入roll，用於圖片致換
+      this.getFirstCheckPoint(charactersPosition);
     },500);
   }
 
+  // 第一個繞圈的人獲勝。設置檢查點
+  getFirstCheckPoint(charactersPosition: any) {
+    if(charactersPosition.currentPosition > 5) {
+      charactersPosition.getFirst = 1;
+    }
+    console.log('charactersPosition = ',charactersPosition.getFirst);
+
+  }
+
+  sendCharactersDataLog() {
+    this.dataService.setCharactersDataLog(this.charactersPositionSoreLog);
+  }
+
+
 }
 
+// GAME SCORE
+@Component({
+  selector: 'game-score',
+  standalone: true,
+  templateUrl: './template/html/gameScore.html',
+  styleUrls: ['./template/css/gameScore.css']
+})
+export class gameScoreApp {
+  winnerImageUrl: string  = '';
+  charactersPositionSoreLog: any;
+  winCondition: any; // 勝利條件儲存變數
+  cellContent: any;
+
+  // get element ID "winnerEvent"
+  @ViewChild('winnerEvent', {static: true}) winnerEvent: ElementRef; 
+
+  // get element ID "circleScore"
+  @ViewChild('circleScore', {static: true}) circleScore: ElementRef;
+
+  // get element ID "squareScore"
+  @ViewChild('squareScore', {static: true}) squareScore: ElementRef;
+
+  constructor(private dataService: DataService) {
+    this.dataService.winConditionSelect.subscribe(data => this.winCondition = data);
+    this.dataService.cellContent.subscribe(data => this.cellContent = data);
+    
+    this.winnerEvent = {} as ElementRef;
+    this.circleScore = {} as ElementRef;
+    this.squareScore = {} as ElementRef;
+
+    this.dataService.charactersDataLog.subscribe(data => {
+      this.currentCharactersScoreDisplay(data);
+    });
+
+  }
+
+  currentCharactersScoreDisplay(data: any) {
+    this.charactersPositionSoreLog = data;
+
+    this.circleScore.nativeElement.innerText = this.charactersPositionSoreLog[0].score;
+    this.squareScore.nativeElement.innerText = this.charactersPositionSoreLog[1].score;
+
+    // console.log('charactersPositionSoreLog = ',this.charactersPositionSoreLog);
+    // console.log('winCondition = ',this.winCondition);
+
+    // 三元運算子 判斷 勝利條件
+    this.winCondition.winCondition == 'getFirst' ? 
+    this.getFirstWinner(this.charactersPositionSoreLog):
+    this.checkScoreWinner(this.charactersPositionSoreLog);
+  }
+
+  // 分數到達獲勝
+  checkScoreWinner(charactersPositionSoreLog: any) {
+    console.log('checkScoreWinner');
+    if (charactersPositionSoreLog[0].score >= parseInt(this.winCondition.score, 10)) {
+      this.winnerImageUrl = '../../assets/circleWinner.png';
+      this.winnerEvent.nativeElement.classList.remove("invisible");
+    } else if(charactersPositionSoreLog[1].score >= parseInt(this.winCondition.score, 10)) {
+      this.winnerImageUrl = '../../assets/squareWinner.png';
+      this.winnerEvent.nativeElement.classList.remove("invisible");
+    }
+  }
+
+  // 第一個，完成一圈獲勝
+  getFirstWinner(charactersPositionSoreLog: any) {
+    console.log('getFirstWinner');
+    if ((charactersPositionSoreLog[0].getFirst == 1) && (charactersPositionSoreLog[0].currentPosition == 0)) {
+      this.winnerImageUrl = '../../assets/circleWinner.png';
+      this.winnerEvent.nativeElement.classList.remove("invisible");
+    } else if((charactersPositionSoreLog[1].getFirst == 1) && (charactersPositionSoreLog[1].currentPosition == 0)) {
+      this.winnerImageUrl = '../../assets/squareWinner.png';
+      this.winnerEvent.nativeElement.classList.remove("invisible");
+    }
+  }
+
+  againGame() {
+    this.winnerEvent.nativeElement.classList.add("invisible");
+    this.charactersPositionSoreLog = [
+      {name: 'circle', currentPosition: 0, score: 0, getFirst: 0},
+      {name: 'square', currentPosition: 0, score: 0, getFirst: 0}
+    ];
+    this.dataService.setCharactersDataLog(this.charactersPositionSoreLog);
+    console.log('charactersPositionSoreLog in Winner = ',this.charactersPositionSoreLog);
+
+    this.winCondition.winCondition = 'againGame';
+    this.winCondition.restart = 'true';
+    this.dataService.setWinCondition(this.winCondition);
+    console.log('charactersPositionSoreLog in Winner = ', this.winCondition);
+
+
+    this.cellContent = [
+      {
+        class: '問題',
+        question: '如果小明有3支鉛筆，小華給了他5支鉛筆，請問小明現在總共有多少支鉛筆？',
+        options: ['8支', '6支', '7支'],
+        answer: '8支'
+      },
+      {
+        class: '問題',
+        question: '如果一個蘋果賣5元，小美用20元買了幾個蘋果？',
+        options: ['4個', '3個', '5個'],
+        answer: '4個'
+      },
+      {
+        class: '問題',
+        question: '如果一個長方形花園的長是6公尺，寬是3公尺，請問它的面積是多少平方公尺？',
+        options: ['18平方公尺', '9平方公尺', '20平方公尺'],
+        answer: '18平方公尺'
+      },
+      {
+        class: '問題',
+        question: '如果一個數字比6大2，結果是多少？',
+        options: ['8', '7', '9'],
+        answer: '8'
+      },
+      {
+        class: '問題',
+        question: '如果小明每天睡覺前都看書半小時，一個星期看了多少小時的書？',
+        options: ['3.5小時', '3小時', '4.5小時'],
+        answer: '3.5小時'
+      },
+      {
+        class: '問題',
+        question: '「一鳴驚人」是用來形容什麼情況？',
+        options: [
+          '比喻平時默默無聞，而後卻突然有驚人的表現。',
+          '比喻圓滿美好毫無缺陷的境界。',
+          '比喻多此一舉，反將事情弄糟。'],
+        answer: '比喻平時默默無聞，而後卻突然有驚人的表現。'
+      },
+      {
+        class: '問題',
+        question: '「畫蛇添足」這個成語的意思是什麼？',
+        options: ['比喻多此一舉，反將事情弄糟。',
+        '比喻平時默默無聞，而後卻突然有驚人的表現。',
+        '比喻見識淺薄的人。'],
+        answer: '比喻多此一舉，反將事情弄糟。'
+      },
+      {
+        class: '問題',
+        question: '「井底之蛙」這個成語是形容什麼樣的人？',
+        options: ['比喻見識淺薄的人。',
+        '比喻多此一舉，反將事情弄糟。',
+        '比喻盲目胡亂地模仿他人，結果卻適得其反。'],
+        answer: '比喻見識淺薄的人。'
+      },
+      {
+        class: '問題',
+        question: '「東施效顰」這個成語的意思是什麼？',
+        options: ['比喻盲目胡亂地模仿他人，結果卻適得其反。',
+        '比喻見識淺薄的人。',
+        '比喻圓滿美好毫無缺陷的境界。'],
+        answer: '比喻盲目胡亂地模仿他人，結果卻適得其反。'
+      },
+      {
+        class: '問題',
+        question: '「十全十美」這個成語的意思是什麼？',
+        options: ['比喻圓滿美好毫無缺陷的境界。',
+        '比喻盲目胡亂地模仿他人，結果卻適得其反。',
+        '比喻平時默默無聞，而後卻突然有驚人的表現。'],
+        answer: '比喻圓滿美好毫無缺陷的境界。'
+      },
+      {
+        class: '命運',
+        content: '扶老奶奶過馬路，玩家前進3格',
+        value: '3'
+      },
+      {
+        class: '命運',
+        content: '在警察面前闖紅燈，玩家退3格',
+        value: '-3'
+      },
+      {
+        class: '機會',
+        content: '路上撿到500元，玩家加3分',
+        value: '3'
+      },
+      {
+        class: '機會',
+        content: '踩到狗大便，玩家扣3分',
+        value: '-3'
+      },
+      {
+        class: '機會',
+        content: '遇到外星人，玩家加5分',
+        value: '5'
+      }
+    ]
+
+    this.dataService.setCellContent(this.cellContent);
+
+  }
+
+}
 
 
 // Composite components
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [gameSetApp, gameCharacterApp],
+  imports: [gameSetApp, gameCharacterApp, gameBannerApp, gameScoreApp],
   template: `
-    <game-set></game-set>
-    <game-character></game-character>
-  `
+
+  <div class ="componentMin-width d-flex justify-content-center align-items-center flex-column">
+
+      <div class="banner container box-shadow min-width d-flex justify-content-center col-xl- rounded-lg bg">
+
+        <game-banner class="container"></game-banner>
+
+      </div>
+
+      <div class="container box-shadow min-width d-flex justify-content-center col-xl- rounded-lg bg">
+        <div #squareGrid id="squareGrid" class="p-4 d-flex flex-column parentsPosition">
+
+            <game-set></game-set>
+            <game-character></game-character>
+
+        </div>
+      </div>
+
+      <game-score></game-score>
+
+  </div>
+
+    `
 })
 export class AppComponent {}
 

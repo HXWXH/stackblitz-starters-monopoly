@@ -1,0 +1,23 @@
+    <!-- game question change destiny -->
+<div #winnerEvent class="winnerEvent invisible d-flex flex-column justify-content-between align-items-center p-5 border border-info rounded shadow-lg">
+    <h1 class="winnerFontStyle">獲 勝 者</h1>
+    <div #winner>
+        <img class="winnerItem" [src]="winnerImageUrl" alt="winner">
+    </div>
+    <div>
+        <button #again class="buttonWidth p-2 btn-lg btn-primary test ml-4 mr-4" (click) = "againGame()">在來一局</button>
+    </div>
+</div>
+    
+    <!-- score -->
+    <div class="parentsPosition mt-3 scoreBoard min-width max-width d-flex justify-content-around align-items-center">
+        <div class="d-flex flex-row">
+          <img class="scoreItem" src="assets/circle.png" alt="circle" />
+          <p class="scoreText m-3">: <span #circleScore class="score ml-5">0</span></p>
+        </div>
+        
+        <div class="d-flex flex-row">
+          <img class="scoreItem" src="assets/square.png" alt="square" />
+          <p class="scoreText m-3">: <span #squareScore class="score ml-5">0</span></p>
+        </div>
+      </div>
